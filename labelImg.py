@@ -90,7 +90,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
         # Save as Pascal voc xml
         self.default_save_dir = default_save_dir
-        self.label_file_format = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.PASCAL_VOC)
+        self.label_file_format = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.YOLO)
 
         # For loading all image under a directory
         self.m_img_list = []
@@ -1161,6 +1161,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
             counter = self.counter_str()
             self.setWindowTitle(__appname__ + ' ' + file_path + ' ' + counter)
+            #self.label_list.sortItems();
 
             # Default : select last item if there is at least one item
             if self.label_list.count():
@@ -1290,7 +1291,8 @@ class MainWindow(QMainWindow, WindowMixin):
                     relative_path = os.path.join(root, file)
                     path = ustr(os.path.abspath(relative_path))
                     images.append(path)
-        natural_sort(images, key=lambda x: x.lower())
+        #natural_sort(images, key=lambda x: x.lower())
+        timedate_sort(images)
         return images
 
     def change_save_dir_dialog(self, _value=False):

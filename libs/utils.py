@@ -1,4 +1,6 @@
 from math import sqrt
+import os
+import platform
 from libs.ustr import ustr
 import hashlib
 import re
@@ -106,6 +108,35 @@ def natural_sort(list, key=lambda s:s):
         return lambda s: [convert(c) for c in re.split('([0-9]+)', key(s))]
     sort_key = get_alphanum_key_func(key)
     list.sort(key=sort_key)
+
+def creation_date(path_to_file):
+    """
+    Try to get the date that a file was created, falling back to when it was
+    last modified if that isn't possible.
+    See http://stackoverflow.com/a/39501288/1709587 for explanation.
+    """
+    if platform.system() == 'Windows':
+        t = os.path.getctime(path_to_file)
+        return t
+    else:
+        stat = os.stat(path_to_file)
+        try:
+            return stat.st_birthtime
+        except AttributeError:
+            # We're probably on Linux. No easy way to get creation dates here,
+            # so we'll settle for when its content was last modified.
+            return stat.st_mtime
+
+def timedate_sort(list):
+    """
+    Sort the list into natural alphanumeric order.
+    """
+    #def get_alphanum_key_func(key):
+    #    convert = lambda text: int(text) if text.isdigit() else text
+    #    return lambda s: [convert(c) for c in re.split('([0-9]+)', key(s))]
+    #sort_key = get_alphanum_key_func(key)
+    #list.sort(key=sort_key)
+    list.sort(key=lambda f: float(creation_date(f)))
 
 
 # QT4 has a trimmed method, in QT5 this is called strip
