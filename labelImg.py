@@ -519,6 +519,9 @@ class MainWindow(QMainWindow, WindowMixin):
         # Populate the File menu dynamically.
         self.update_file_menu()
 
+        if(self.file_path == None):
+            self.file_path = self.last_open_dir
+
         # Since loading the file may take some time, make sure it runs in the background.
         if self.file_path and os.path.isdir(self.file_path):
             self.queue_event(partial(self.import_dir_images, self.file_path or ""))

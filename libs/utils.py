@@ -136,7 +136,7 @@ def timedate_sort(list):
     #    return lambda s: [convert(c) for c in re.split('([0-9]+)', key(s))]
     #sort_key = get_alphanum_key_func(key)
     #list.sort(key=sort_key)
-    list.sort(key=lambda f: float(creation_date(f)))
+    list.sort(key=lambda f: float(9000000000 - creation_date(f)))
 
 
 # QT4 has a trimmed method, in QT5 this is called strip
