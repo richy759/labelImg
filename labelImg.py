@@ -1364,7 +1364,14 @@ class MainWindow(QMainWindow, WindowMixin):
         self.last_open_dir = target_dir_path
         self.import_dir_images(target_dir_path)
         self.default_save_dir = target_dir_path
+
+        # open labels dir
         self.default_save_dir = os.path.normpath(os.path.join(os.path.dirname( target_dir_path ), 'labels'))
+
+        class_path = self.default_save_dir + "\\classes.txt"
+
+        self.load_predefined_classes(class_path)
+
         if self.file_path:
             self.show_bounding_box_from_annotation_file(file_path=self.file_path)
 
@@ -1528,6 +1535,15 @@ class MainWindow(QMainWindow, WindowMixin):
         if delete_path is not None:
             idx = self.cur_img_idx
             if os.path.exists(delete_path):
+
+                image_file_name = os.path.basename(self.file_path)
+                saved_file_name = os.path.splitext(image_file_name)[0]
+                saved_path = os.path.join(ustr(self.default_save_dir), saved_file_name)
+
+                saved_path += ".txt"
+                if os.path.exists(saved_path):
+                    os.remove(saved_path)
+
                 os.remove(delete_path)
             self.import_dir_images(self.last_open_dir)
             if self.img_count > 0:
@@ -1616,6 +1632,7 @@ class MainWindow(QMainWindow, WindowMixin):
     def load_predefined_classes(self, predef_classes_file):
         if os.path.exists(predef_classes_file) is True:
             with codecs.open(predef_classes_file, 'r', 'utf8') as f:
+                self.label_hist = None
                 for line in f:
                     line = line.strip()
                     if self.label_hist is None:
