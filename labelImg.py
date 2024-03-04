@@ -1545,7 +1545,19 @@ class MainWindow(QMainWindow, WindowMixin):
                     os.remove(saved_path)
 
                 os.remove(delete_path)
-            self.import_dir_images(self.last_open_dir)
+            #self.import_dir_images(self.last_open_dir)
+
+            
+            listItems=self.file_list_widget.selectedItems()
+            if not listItems: return        
+            for item in listItems:
+                self.file_list_widget.takeItem(self.file_list_widget.row(item))
+
+            #self.file_list_widget.removeItemWidget(self.file_list_widget.selectedItems)
+
+            del self.m_img_list[self.cur_img_idx]
+            self.img_count = self.img_count - 1
+
             if self.img_count > 0:
                 self.cur_img_idx = min(idx, self.img_count - 1)
                 filename = self.m_img_list[self.cur_img_idx]
