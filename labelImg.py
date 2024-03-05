@@ -1163,7 +1163,7 @@ class MainWindow(QMainWindow, WindowMixin):
             self.show_bounding_box_from_annotation_file(self.file_path)
 
             counter = self.counter_str()
-            self.setWindowTitle(__appname__ + ' ' + file_path + ' ' + counter)
+            self.setWindowTitle(__appname__ + ' ' + file_path + ' ' + counter + ' ' + str(image.width()) + 'x' + str(image.height()))
             #self.label_list.sortItems();
 
             # Default : select last item if there is at least one item
