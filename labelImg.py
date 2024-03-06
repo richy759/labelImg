@@ -551,6 +551,18 @@ class MainWindow(QMainWindow, WindowMixin):
             # Draw rectangle if Ctrl is pressed
             self.canvas.set_drawing_shape_to_square(True)
 
+
+    def get_save_ext(self):
+        if self.label_file_format == LabelFileFormat.PASCAL_VOC:
+            return XML_EXT
+
+        elif self.label_file_format == LabelFileFormat.YOLO:
+            return TXT_EXT
+
+        elif self.label_file_format == LabelFileFormat.CREATE_ML:
+            return JSON_EXT
+
+
     # Support Functions #
     def set_format(self, save_format):
         if save_format == FORMAT_PASCALVOC:
@@ -1439,6 +1451,12 @@ class MainWindow(QMainWindow, WindowMixin):
             if self.default_save_dir is not None:
                 if self.dirty is True:
                     self.save_file()
+                else:
+                    save_file = self.get_save_filename()
+                    if(len(save_file) > 0 and os.path.isfile(save_file) == False):
+                        if(self.save_empty_label_dialog() ==  QMessageBox.StandardButton.Yes):
+                            self.save_file()
+
             else:
                 self.change_save_dir_dialog()
                 return
@@ -1478,20 +1496,36 @@ class MainWindow(QMainWindow, WindowMixin):
             self.img_count = 1
             self.load_file(filename)
 
-    def save_file(self, _value=False):
+    def get_save_filename(self, _value=False):
         if self.default_save_dir is not None and len(ustr(self.default_save_dir)):
             if self.file_path:
                 image_file_name = os.path.basename(self.file_path)
                 saved_file_name = os.path.splitext(image_file_name)[0]
                 saved_path = os.path.join(ustr(self.default_save_dir), saved_file_name)
-                self._save_file(saved_path)
+
+                saved_path += self.get_save_ext()
+
+                return saved_path
         else:
             image_file_dir = os.path.dirname(self.file_path)
             image_file_name = os.path.basename(self.file_path)
             saved_file_name = os.path.splitext(image_file_name)[0]
             saved_path = os.path.join(image_file_dir, saved_file_name)
+            return saved_path
+        
+        return ''
+
+    def save_file(self, _value=False):
+        if self.default_save_dir is not None and len(ustr(self.default_save_dir)):
+            if self.file_path:
+                saved_path = self.get_save_filename()
+                self._save_file(saved_path)
+        else:
+            saved_path = self.get_save_filename()
             self._save_file(saved_path if self.label_file
                             else self.save_file_dialog(remove_ext=False))
+            
+    
 
     def save_file_as(self, _value=False):
         assert not self.image.isNull(), "cannot save empty image"
@@ -1588,6 +1622,16 @@ class MainWindow(QMainWindow, WindowMixin):
         yes, no, cancel = QMessageBox.Yes, QMessageBox.No, QMessageBox.Cancel
         msg = u'You have unsaved changes, would you like to save them and proceed?\nClick "No" to undo all changes.'
         return QMessageBox.warning(self, u'Attention', msg, yes | no | cancel)
+    
+    def save_empty_label_dialog(self):
+        msg = QMessageBox();
+        msg.setText('There is no label file for this image, create a blank one?.')
+        msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        return msg.exec()
+
+        yes, no, cancel = QMessageBox.Yes, QMessageBox.No, QMessageBox.Cancel
+        msg = u'There is no label file for this image, create a blank one?.'
+        return QMessageBox.warning(self, u'Attention', msg, yes | no)
 
     def error_message(self, title, message):
         return QMessageBox.critical(self, title,
