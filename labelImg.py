@@ -1374,11 +1374,14 @@ class MainWindow(QMainWindow, WindowMixin):
         else:
             target_dir_path = ustr(default_open_dir_path)
         self.last_open_dir = target_dir_path
-        self.import_dir_images(target_dir_path)
-        self.default_save_dir = target_dir_path
 
+        # this seems to be referenced in open_next_image
+        self.default_save_dir = target_dir_path
         # open labels dir
         self.default_save_dir = os.path.normpath(os.path.join(os.path.dirname( target_dir_path ), 'labels'))
+
+        self.import_dir_images(target_dir_path)
+        
 
         class_path = self.default_save_dir + "\\classes.txt"
 
